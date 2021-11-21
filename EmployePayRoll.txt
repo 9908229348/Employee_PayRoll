@@ -39,3 +39,31 @@ mysql> show databases;
 mysql> use payrollservice;
 Database changed
 mysql>
+
+Uc2-Ability to create employee payroll data in the payroll service database as part of CRUD Operation - Use payroll_service database
+
+mysql> use payrollservice;
+Database changed
+
+mysql> create table employee_payroll
+    -> (
+    -> id int not null auto_increment,
+    -> name varchar(250) not null,
+    -> salary double not null,
+    -> start varchar(250) not null,
+    -> PRIMARY KEY(id)
+    -> );
+Query OK, 0 rows affected (2.51 sec)
+
+mysql> describe employee_payroll;
++--------+--------------+------+-----+---------+----------------+
+| Field  | Type         | Null | Key | Default | Extra          |
++--------+--------------+------+-----+---------+----------------+
+| id     | int          | NO   | PRI | NULL    | auto_increment |
+| name   | varchar(250) | NO   |     | NULL    |                |
+| salary | double       | NO   |     | NULL    |                |
+| start  | varchar(250) | NO   |     | NULL    |                |
++--------+--------------+------+-----+---------+----------------+
+4 rows in set (0.12 sec)
+
+mysql>
