@@ -184,3 +184,49 @@ mysql> select count(salary) from employee_payroll where gender='M' group by gend
 1 row in set (0.00 sec)
 
 mysql>
+
+
+Uc8-Ability to extend employee_payroll data to store employee information like employee phone, address and department
+
+mysql> alter table employee_payroll add phone varchar(250) after salary;
+Query OK, 0 rows affected (1.27 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add address varchar(250) after phone;
+Query OK, 0 rows affected (2.22 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add department varchar(250) not null after address;
+Query OK, 0 rows affected (1.51 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll alter address set default 'TBD';
+Query OK, 0 rows affected (0.11 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee_payroll;
++----+---------+--------+---------+-------+---------+------------+------------+
+| id | name    | gender | salary  | phone | address | department | start      |
++----+---------+--------+---------+-------+---------+------------+------------+
+|  1 | Bill    | M      | 1000000 | NULL  | NULL    |            | 2018-01-03 |
+|  2 | Mark    | F      | 2000000 | NULL  | NULL    |            | 2019-11-13 |
+|  3 | Charlie | M      | 3000000 | NULL  | NULL    |            | 2020-05-21 |
++----+---------+--------+---------+-------+---------+------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> describe employee_payroll;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id         | int          | NO   | PRI | NULL    | auto_increment |
+| name       | varchar(250) | NO   |     | NULL    |                |
+| gender     | char(1)      | YES  |     | NULL    |                |
+| salary     | double       | NO   |     | NULL    |                |
+| phone      | varchar(250) | YES  |     | NULL    |                |
+| address    | varchar(250) | YES  |     | TBD     |                |
+| department | varchar(250) | NO   |     | NULL    |                |
+| start      | varchar(250) | NO   |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.08 sec)
+
+mysql>
