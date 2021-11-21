@@ -1,0 +1,41 @@
+Uc1-Ability to create a payrollservice database
+
+mysql> show databases;
++---------------------------+
+| Database                  |
++---------------------------+
+| addressbook_normalization |
+| addressbook_service       |
+| information_schema        |
+| mysql                     |
+| payroll_service           |
+| performance_schema        |
+| sakila                    |
+| sys                       |
+| world                     |
++---------------------------+
+9 rows in set (0.00 sec)
+
+mysql> create DATABASE PayRollService;
+Query OK, 1 row affected (0.47 sec)
+
+mysql> show databases;
++---------------------------+
+| Database                  |
++---------------------------+
+| addressbook_normalization |
+| addressbook_service       |
+| information_schema        |
+| mysql                     |
+| payroll_service           |
+| payrollservice            |
+| performance_schema        |
+| sakila                    |
+| sys                       |
+| world                     |
++---------------------------+
+10 rows in set (0.00 sec)
+
+mysql> use payrollservice;
+Database changed
+mysql>
