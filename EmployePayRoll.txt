@@ -299,3 +299,267 @@ mysql> select * from employee_payroll;
 5 rows in set (0.00 sec)
 
 mysql>
+
+Uc12-Ensure all retrieve queries done especially in UC 4, UC 5 and UC 7 are working with new table structure
+
+mysql> create table company
+    -> (
+    -> company_id int,
+    -> company_name varchar(250)
+    -> );
+Query OK, 0 rows affected (0.48 sec)
+
+mysql> drop table company;
+Query OK, 0 rows affected (0.92 sec)
+
+mysql> show tables;
++---------------------------+
+| Tables_in_payroll_service |
++---------------------------+
+| employee_payroll          |
++---------------------------+
+1 row in set (0.08 sec)
+
+mysql> create table company
+    -> (
+    -> company_id int,
+    -> company_name varchar(250),
+    -> PRIMARY KEY (company_id)
+    -> );
+Query OK, 0 rows affected (0.33 sec)
+
+mysql> describe company;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| company_id   | int          | NO   | PRI | NULL    |       |
+| company_name | varchar(250) | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+2 rows in set (0.06 sec)
+
+mysql> insert into company (company_id, company_name) values
+    -> (1, 'AAA'),
+    -> (2, 'BBB'),
+    -> (3, 'CCC'),
+    -> (4, 'DDD');
+Query OK, 4 rows affected (0.12 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from company;
++------------+--------------+
+| company_id | company_name |
++------------+--------------+
+|          1 | AAA          |
+|          2 | BBB          |
+|          3 | CCC          |
+|          4 | DDD          |
++------------+--------------+
+4 rows in set (0.00 sec)
+
+mysql> create table employee
+    -> (
+    -> employee_id int not null auto_increment,
+    -> employee_name varchar(250) not null,
+    -> phonenumber varchar(250),
+    -> address varchar(250),
+    -> gender char(1),
+    -> company_id int,
+    -> PRIMARY KEY (employee_id),
+    -> FOREIGN KEY(company_id) REFERENCES company(company_id);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 10
+mysql> create table employee
+    -> (
+    -> employee_id int not null auto_increment,
+    -> employee_name varchar(250) not null,
+    -> phonenumber varchar(250),
+    -> address varchar(250),
+    -> gender char(1),
+    -> company_id int,
+    -> PRIMARY KEY (employee_id),
+    -> FOREIGN KEY(company_id) REFERENCES company(company_id)
+    -> );
+Query OK, 0 rows affected (1.60 sec)
+
+mysql> describe employee;
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| employee_id   | int          | NO   | PRI | NULL    | auto_increment |
+| employee_name | varchar(250) | NO   |     | NULL    |                |
+| phonenumber   | varchar(250) | YES  |     | NULL    |                |
+| address       | varchar(250) | YES  |     | NULL    |                |
+| gender        | char(1)      | YES  |     | NULL    |                |
+| company_id    | int          | YES  | MUL | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+6 rows in set (0.06 sec)
+
+mysql> insert into employee (employee_name, phonenumber, address, gender, company_id) values
+    -> ('Mark', '9876543210', 'abcd', 'F', 2),
+    -> ('Charlie', '9870654321', 'efgh', 'F', 1),
+    -> ('Bill', '8765432190', 'ijkl', 'M',2),
+    -> ('Terisa', '765432190', 'mnop', 'F', 4),
+    -> ('Sravanthi', '9908229348', 'atp', 'F', 3),
+    -> ('Hema', '8639012896', 'ap', 'M', 5);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`payroll_service`.`employee`, CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`))
+mysql> insert into employee (employee_name, phonenumber, address, gender, company_id) values
+    -> ('Sravanthi', '9908229348', 'atp', 'F', 3);
+Query OK, 1 row affected (0.08 sec)
+
+mysql> insert into employee (employee_name, phonenumber, address, gender, company_id) values
+    -> ('Hema', '8639012896', 'ap', 'M', 5);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`payroll_service`.`employee`, CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`))
+mysql> insert into employee (employee_name, phonenumber, address, gender, company_id) values
+    -> ('Mark', '9876543210', 'abcd', 'F', 2),
+    -> ('Charlie', '9870654321', 'efgh', 'F', 1),
+    -> ('Bill', '8765432190', 'ijkl', 'M',2),
+    -> ('Terisa', '765432190', 'mnop', 'F', 4),
+    -> ('Hema', '8639012896', 'ap', 'M', 3);
+Query OK, 5 rows affected (0.17 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee;
++-------------+---------------+-------------+---------+--------+------------+
+| employee_id | employee_name | phonenumber | address | gender | company_id |
++-------------+---------------+-------------+---------+--------+------------+
+|           7 | Sravanthi     | 9908229348  | atp     | F      |          3 |
+|           9 | Mark          | 9876543210  | abcd    | F      |          2 |
+|          10 | Charlie       | 9870654321  | efgh    | F      |          1 |
+|          11 | Bill          | 8765432190  | ijkl    | M      |          2 |
+|          12 | Terisa        | 765432190   | mnop    | F      |          4 |
+|          13 | Hema          | 8639012896  | ap      | M      |          3 |
++-------------+---------------+-------------+---------+--------+------------+
+6 rows in set (0.00 sec)
+
+mysql> create table payroll
+    -> (
+    -> employee_id int,
+    -> basic_pay double,
+    -> deductions double,
+    -> taxable_pay double,
+    -> tax double,
+    -> net_pay double,
+    -> PRIMARY KEY(employee_id)
+    -> );
+Query OK, 0 rows affected (1.59 sec)
+
+mysql> describe payroll;
++-------------+--------+------+-----+---------+-------+
+| Field       | Type   | Null | Key | Default | Extra |
++-------------+--------+------+-----+---------+-------+
+| employee_id | int    | NO   | PRI | NULL    |       |
+| basic_pay   | double | YES  |     | NULL    |       |
+| deductions  | double | YES  |     | NULL    |       |
+| taxable_pay | double | YES  |     | NULL    |       |
+| tax         | double | YES  |     | NULL    |       |
+| net_pay     | double | YES  |     | NULL    |       |
++-------------+--------+------+-----+---------+-------+
+6 rows in set (0.10 sec)
+
+mysql> insert into payroll (employee_id, basic_pay, deductions, taxable_pay, tax, net_pay) values
+    -> (7, 300000, 100000, 200000, 50000, 150000),
+    -> (9, 400000, 200000, 200000, 50000, 150000),
+    -> (10, 500000, 300000, 200000, 50000, 150000),
+    -> (11, 600000, 400000, 200000, 50000, 150000),
+    -> (12, 700000, 500000, 200000, 50000, 150000),
+    -> (13, 800000, 600000, 200000, 50000, 150000);
+Query OK, 6 rows affected (0.26 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> select * from payroll;
++-------------+-----------+------------+-------------+-------+---------+
+| employee_id | basic_pay | deductions | taxable_pay | tax   | net_pay |
++-------------+-----------+------------+-------------+-------+---------+
+|           7 |    300000 |     100000 |      200000 | 50000 |  150000 |
+|           9 |    400000 |     200000 |      200000 | 50000 |  150000 |
+|          10 |    500000 |     300000 |      200000 | 50000 |  150000 |
+|          11 |    600000 |     400000 |      200000 | 50000 |  150000 |
+|          12 |    700000 |     500000 |      200000 | 50000 |  150000 |
+|          13 |    800000 |     600000 |      200000 | 50000 |  150000 |
++-------------+-----------+------------+-------------+-------+---------+
+6 rows in set (0.00 sec)
+
+mysql> create table department
+    -> (
+    -> department_id int not null auto_increment,
+    -> department_name varchar(250),
+    -> PRIMARY KEY (department_id)
+    -> );
+Query OK, 0 rows affected (1.97 sec)
+
+mysql> insert into department (department_name) values
+    -> (Sales),
+    -> (Marketting),
+    -> (PostalService),
+    -> (IncomeTax);
+ERROR 1054 (42S22): Unknown column 'Sales' in 'field list'
+mysql> insert into department (department_name) value
+    -> (Sales),
+    -> (Marketting),
+    -> (PostalService),
+    -> (IncomeTax);
+ERROR 1054 (42S22): Unknown column 'Sales' in 'field list'
+mysql> insert into department (department_name) values
+    -> ('Sales'),
+    -> ('Marketting'),
+    -> ('PostalService'),
+    -> ('IncomeTax');
+Query OK, 4 rows affected (0.20 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from department;
++---------------+-----------------+
+| department_id | department_name |
++---------------+-----------------+
+|             1 | Sales           |
+|             2 | Marketting      |
+|             3 | PostalService   |
+|             4 | IncomeTax       |
++---------------+-----------------+
+4 rows in set (0.00 sec)
+
+mysql> create table employee_department
+    -> (
+    -> employee_id int,
+    -> department_id int
+    -> ^C
+mysql> create table employee_department
+    -> (
+    -> employee_id int,
+    -> department_id int,
+    -> FOREIGN KEY (employee_id) REFERENCES employee(employee_id),
+    -> FOREIGN KEY (department_id) REFERENCES department(department_id)
+    -> );
+Query OK, 0 rows affected (1.94 sec)
+
+mysql> describe employee_department;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| employee_id   | int  | YES  | MUL | NULL    |       |
+| department_id | int  | YES  | MUL | NULL    |       |
++---------------+------+------+-----+---------+-------+
+2 rows in set (0.04 sec)
+
+mysql> insert into employee_department(employee_id, department_id) values
+    -> (7, 1),
+    -> (9, 2),
+    -> (10, 3),
+    -> (11, 4),
+    -> (12, 1),
+    -> (13, 2);
+Query OK, 6 rows affected (0.20 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee_department;
++-------------+---------------+
+| employee_id | department_id |
++-------------+---------------+
+|           7 |             1 |
+|           9 |             2 |
+|          10 |             3 |
+|          11 |             4 |
+|          12 |             1 |
+|          13 |             2 |
++-------------+---------------+
+6 rows in set (0.00 sec)
+
